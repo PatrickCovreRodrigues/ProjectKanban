@@ -55,7 +55,7 @@ class Project:
     __tablename__ = 'projects'
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    title: Mapped[str]
+    name: Mapped[str]
     description_activity: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
          # pylint: disable=not-callable
@@ -71,7 +71,7 @@ class Activity:
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
-    description_activity: Mapped[str]
+    description_project: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
          # pylint: disable=not-callable
         init=False, server_default=func.now()

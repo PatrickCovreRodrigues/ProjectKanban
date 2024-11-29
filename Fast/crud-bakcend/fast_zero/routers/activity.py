@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
-from fast_zero.models.model import Activity, User
+from fast_zero.models.model import Activity, Project
 from fast_zero.schemas.schemaActivity import ActivityCreate
 from fast_zero.schemas.schemaMessage import Message
 
@@ -17,13 +17,13 @@ router = APIRouter(
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=ActivityCreate)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
-    customer_user = session.scalar(
-        select(User).where(User.id == activity.customer_id)
+    project = session.scalar(
+        select(Project).where(Project.id == activity.project_id)
     )
-    if not customer_user:
+    if not project:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail='Cliente não existe'
+            detail='Projeto não existe'
         )
     activity_creat = session.scalar(
         select(Activity).where(Activity.id == activity.id)
@@ -36,7 +36,7 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
-        customer_id=activity.customer_id
+        project=activity.project_id
     )
     session.add(new_activity)
     session.commit()
@@ -71,17 +71,17 @@ def update_activity(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Atividade não encontrada'
         )
-    customer_user = session.scalar(
-        select(User).where(User.id == activity.customer_id)
+    project = session.scalar(
+        select(Project).where(Project.id == activity.project_id)
     )
-    if not customer_user:
+    if not project:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Cliente não encontrado'
         )
     db_activity.name = activity.name
     db_activity.description_activity = activity.description_activity
-    db_activity.customer_id = activity.customer_id
+    db_activity.project_id = activity.project_id
     session.commit()
     session.refresh(db_activity)
 

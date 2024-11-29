@@ -15,11 +15,6 @@ router = APIRouter(
     tags=['customers'],
 )
 
-@router.get('/', response_model=CustomerList)
-def read_customer_all(session: Session = Depends(get_session)):
-    customers = session.query(User).all()
-    return {"customers": customers}
-
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=CustomerCreate)
 def customer_registration(customer: CustomerCreate, session: Session = Depends(get_session)):
@@ -45,6 +40,12 @@ def customer_registration(customer: CustomerCreate, session: Session = Depends(g
     session.refresh(new_customer)
 
     return new_customer
+
+
+@router.get('/', response_model=CustomerList)
+def read_customer_all(session: Session = Depends(get_session)):
+    customers = session.query(User).all()
+    return {"customers": customers}
 
 
 @router.get('/{customer_id}', response_model=CustomerCreate)
