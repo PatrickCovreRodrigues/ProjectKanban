@@ -5,4 +5,4 @@ class ActivityCreate(BaseModel):
     id: int
     name: str
     description_activity: str
-    customer_id: int
+    project_id: int
