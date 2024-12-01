@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
-from fast_zero.models.model import Activity, Project
+from fast_zero.models.model import Activity, User
 from fast_zero.schemas.schemaActivity import ActivityCreate
 from fast_zero.schemas.schemaMessage import Message
 
@@ -17,10 +17,10 @@ router = APIRouter(
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=ActivityCreate)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
-    project = session.scalar(
-        select(Project).where(Project.id == activity.project_id)
+    customer = session.scalar(
+        select(User).where(User.id == activity.customer_id)
     )
-    if not project:
+    if not customer:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Projeto não existe'
@@ -36,7 +36,7 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
-        project=activity.project_id
+        project=activity.customer_id
     )
     session.add(new_activity)
     session.commit()
@@ -71,17 +71,17 @@ def update_activity(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Atividade não encontrada'
         )
-    project = session.scalar(
-        select(Project).where(Project.id == activity.project_id)
+    customer = session.scalar(
+        select(User).where(User.id == activity.customer_id)
     )
-    if not project:
+    if not customer:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Cliente não encontrado'
         )
     db_activity.name = activity.name
     db_activity.description_activity = activity.description_activity
-    db_activity.project_id = activity.project_id
+    db_activity.project_id = activity.customer_id
     session.commit()
     session.refresh(db_activity)
 
