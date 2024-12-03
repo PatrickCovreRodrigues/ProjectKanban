@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from fast_zero.models.database import get_session
 from fast_zero.models.model import User
-from fast_zero.schemas.schemaCustomers import CustomerCreate, CustomerList
+from fast_zero.schemas.schemaCustomers import CustomerCreate
 from fast_zero.schemas.schemaMessage import Message
 
 router = APIRouter(
@@ -28,7 +28,7 @@ def customer_registration(customer: CustomerCreate, session: Session = Depends(g
         if db_user.email == customer.email:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                detail='Email já existe'
+                detail='Email já existe!'
             )
     new_customer = User(
         name=customer.name,
@@ -40,12 +40,6 @@ def customer_registration(customer: CustomerCreate, session: Session = Depends(g
     session.refresh(new_customer)
 
     return new_customer
-
-
-@router.get('/', response_model=CustomerList)
-def read_customer_all(session: Session = Depends(get_session)):
-    customers = session.query(User).all()
-    return {"customers": customers}
 
 
 @router.get('/{customer_id}', response_model=CustomerCreate)
@@ -83,7 +77,7 @@ def update_customer(
     except IntegrityError as exc:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Email já existe'
+            detail='Email já existe!'
         ) from exc
 
 
@@ -100,4 +94,4 @@ def delete_customer(
         )
     session.delete(db_user)
     session.commit()
-    return {'message': 'Cliente deletado'}
+    return {'message': 'Cliente deletado!'}

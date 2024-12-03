@@ -12,6 +12,8 @@ sqlalchemy = "^2.0.36"
 pydantic-settings = "^2.6.1"
 alembic = "^1.14.0"
 tzdata = "^2024.2"
+psycopg = {extras = ["binary"], version = "^3.2.3"}
+psycopg2 = {extras = ["binary"], version = "^2.9.10"}
 
 
 [tool.poetry.group.dev.dependencies]

@@ -25,6 +25,18 @@ VALID_STATE_TRANSITIONS = {
 
 
 @table_registry.mapped_as_dataclass
+class Todo:
+    __tablename__ = 'todos'
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    title: Mapped[str]
+    description_activity: Mapped[str]
+    state: Mapped[TodoState]
+
+    activity_id: Mapped[int] = mapped_column(ForeignKey('activitys.id'))
+
+
+@table_registry.mapped_as_dataclass
 class User:
     __tablename__ = 'users'
 
@@ -39,30 +51,18 @@ class User:
 
 
 @table_registry.mapped_as_dataclass
-class Todo:
-    __tablename__ = 'todos'
-
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    title: Mapped[str]
-    description_activity: Mapped[str]
-    state: Mapped[TodoState]
-
-    activity_id: Mapped[int] = mapped_column(ForeignKey('activitys.id'))
-
-
-@table_registry.mapped_as_dataclass
 class Project:
     __tablename__ = 'projects'
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
-    description_activity: Mapped[str]
+    description_project: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
          # pylint: disable=not-callable
         init=False, server_default=func.now()
     )
 
-    customer_project: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    customer_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
 
 
 @table_registry.mapped_as_dataclass
@@ -71,7 +71,7 @@ class Activity:
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
-    description_project: Mapped[str]
+    description_activity: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
          # pylint: disable=not-callable
         init=False, server_default=func.now()

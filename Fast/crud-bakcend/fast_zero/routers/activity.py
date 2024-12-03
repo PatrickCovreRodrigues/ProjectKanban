@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from fast_zero.models.database import get_session
 from fast_zero.models.model import Activity, User
 from fast_zero.schemas.schemaActivity import ActivityCreate
-from fast_zero.schemas.schemaMessage import Message
 
 router = APIRouter(
     prefix='/activity',
@@ -17,13 +16,13 @@ router = APIRouter(
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=ActivityCreate)
 def activity_created(activity: ActivityCreate, session: Session = Depends(get_session)):
-    customer = session.scalar(
+    customer_user = session.scalar(
         select(User).where(User.id == activity.customer_id)
     )
-    if not customer:
+    if not customer_user:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail='Projeto não existe'
+            detail='Cliente não existe'
         )
     activity_creat = session.scalar(
         select(Activity).where(Activity.id == activity.id)
@@ -36,7 +35,7 @@ def activity_created(activity: ActivityCreate, session: Session = Depends(get_se
     new_activity = Activity(
         name=activity.name,
         description_activity=activity.description_activity,
-        project=activity.customer_id
+        customer_id=activity.customer_id
     )
     session.add(new_activity)
     session.commit()
@@ -71,24 +70,21 @@ def update_activity(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Atividade não encontrada'
         )
-    customer = session.scalar(
-        select(User).where(User.id == activity.customer_id)
-    )
-    if not customer:
+    if not activity.customer_id:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Cliente não encontrado'
         )
     db_activity.name = activity.name
     db_activity.description_activity = activity.description_activity
-    db_activity.project_id = activity.customer_id
+    db_activity.customer_id = activity.customer_id
     session.commit()
     session.refresh(db_activity)
 
     return db_activity
 
 
-@router.delete('/{activity_id}', response_model=Message)
+@router.delete('/{activity_id}', response_model=dict)
 def delete_activity(
     activity_id: int,
     session: Session = Depends(get_session)
